@@ -1,65 +1,63 @@
 #include <stdio.h>
 
-struct Item {
-    int weight, value;
-    float ratio;
-};
-
-void sort(struct Item arr[], int n) {
-    for (int i = 0; i < n-1; i++)
-        for (int j = 0; j < n-i-1; j++)
-            if (arr[j].ratio < arr[j+1].ratio) {
-                struct Item temp = arr[j];
-                arr[j] = arr[j+1];
-                arr[j+1] = temp;
-            }
+int max(int a, int b)
+{
+    return (a > b) ? a : b;
 }
 
-int main() {
-    int n, capacity;
-    struct Item arr[100];
+int knapsack(int W, int wt[], int val[], int n)
+{
+    int i, w;
+
+    int K[n + 1][W + 1];
+
+    for(i = 0; i <= n; i++)
+    {
+        for(w = 0; w <= W; w++)
+        {
+            if(i == 0 || w == 0)
+            {
+                K[i][w] = 0;
+            }
+            else if(wt[i - 1] <= w)
+            {
+                K[i][w] = max(
+                    val[i - 1] + K[i - 1][w - wt[i - 1]],
+                    K[i - 1][w]
+                );
+            }
+            else
+            {
+                K[i][w] = K[i - 1][w];
+            }
+        }
+    }
+
+    return K[n][W];
+}
+
+int main()
+{
+    int n, W, i;
 
     printf("Enter number of items: ");
     scanf("%d", &n);
 
-    for (int i = 0; i < n; i++) {
-        printf("\nItem %d\n", i+1);
-        printf("Value: ");
-        scanf("%d", &arr[i].value);
-        printf("Weight: ");
-        scanf("%d", &arr[i].weight);
-        arr[i].ratio = (float)arr[i].value / arr[i].weight;
-    }
+    int wt[n], val[n];
 
-    printf("\nEnter knapsack capacity: ");
-    scanf("%d", &capacity);
+    printf("Enter weights of items: ");
+    for(i = 0; i < n; i++)
+        scanf("%d", &wt[i]);
 
-    sort(arr, n);
+    printf("Enter values of items: ");
+    for(i = 0; i < n; i++)
+        scanf("%d", &val[i]);
 
-    float totalValue = 0.0;
+    printf("Enter knapsack capacity: ");
+    scanf("%d", &W);
 
-    printf("\nItems taken:\n");
-
-    for (int i = 0; i < n; i++) {
-        if (capacity == 0) break;
-
-        if (arr[i].weight <= capacity) {
-            
-            capacity -= arr[i].weight;
-            totalValue += arr[i].value;
-            printf("Item %d -> FULL (Value = %d)\n", i+1, arr[i].value);
-        } else {
-            
-            float fraction = (float)capacity / arr[i].weight;
-            totalValue += arr[i].value * fraction;
-            printf("Item %d -> %.2f fraction\n", i+1, fraction);
-            capacity = 0;
-        }
-    }
-
-    printf("\nMaximum Value = %.2f\n", totalValue);
+    printf("Maximum value = %d\n",
+           knapsack(W, wt, val, n));
 
     return 0;
 }
-
-
