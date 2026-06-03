@@ -1,45 +1,62 @@
-#include<stdio.h>
-#define Max 100
-int graph[Max][Max];
-int indegree[Max];
-int queue[Max];
-int front=0,rear=0;
-int main(){
-    int n,e;
-    printf("Enter number of vertices: ");
-    scanf("%d",&n); 
-    printf("Enter number of edges: ");
-    scanf("%d",&e);
+#include <stdio.h>
 
-    for(int i=0;i<n;i++){
-        indegree[i] = 0;
-        for(int j=0;j<n;j++){
-            graph[i][j] = 0;
-        }
-    }
-    printf("Enter edges (u v):\n");
-    for(int i=0;i<e;i++){
-        int u,v;
-        scanf("%d %d",&u,&v);
-        graph[u][v] = 1; 
+#define MAX 100
+
+int main() {
+    int n, e;
+    int graph[MAX][MAX] = {0};
+    int indegree[MAX] = {0};
+    int queue[MAX], front = 0, rear = 0;
+    int topo[MAX], count = 0;
+
+    printf("Enter no. of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter no. of edges: ");
+    scanf("%d", &e);
+
+    printf("Enter edges (u, v)\n");
+
+    for (int i = 0; i < e; i++) {
+        int u, v;
+        scanf("%d %d", &u, &v);
+
+        graph[u][v] = 1;
         indegree[v]++;
     }
-    for(int i=0;i<n;i++){
-        if(indegree[i] == 0){
-            queue[rear++] = i; 
+
+    for (int i = 1; i <= n; i++) {
+        if (indegree[i] == 0) {
+            queue[rear++] = i;
         }
     }
-    printf("Topological Sort: ");
-    while(front < rear){
-        int current = queue[front++];
-        printf("%d ",current);
-        for(int j=0;j<n;j++){
-            if(graph[current][j] == 1){
-                indegree[j]--;
-                if(indegree[j] == 0){
-                    queue[rear++] = j; 
+
+    while (front < rear) {
+        int u = queue[front++];
+        topo[count++] = u;
+
+        for (int v = 1; v <= n; v++) {
+            if (graph[u][v]) {
+                indegree[v]--;
+
+                if (indegree[v] == 0) {
+                    queue[rear++] = v;
                 }
             }
         }
-        return 0;
+    }
+
+    if (count != n) {
+        printf("Graph has a cycle. Topological sort not possible.\n");
+    } else {
+        printf("Topological Order: ");
+
+        for (int i = 0; i < count; i++) {
+            printf("%d ", topo[i]);
+        }
+
+        printf("\n");
+    }
+
+    return 0;
 }
